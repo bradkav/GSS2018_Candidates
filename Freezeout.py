@@ -13,7 +13,7 @@ def g_star(T):
     return 10.75
 
 def number_density(T, limit='rel'):
-
+    '''Eq. 3.6 from Dodelson '''
     # non-relativistic m_i >> T
     if limit == 'nonrel' :
         n_i = g_i * (m_i * T / (2*np.pi))**(3/2) * np.exp(-m_i/T)
