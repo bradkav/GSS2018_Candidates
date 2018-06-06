@@ -5,6 +5,10 @@ import scipy
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+
+
 M_pl = 2.435e18 #GeV/c^2
 
 
@@ -63,3 +67,22 @@ class Freezeout(object):
     def dYdx(self, Yn, x):
         '''The '''
         lambda = self.mass**3 sigv / H(m)
+<<<<<<< HEAD
+=======
+
+def g_star(T):
+    return 10.75
+
+
+def number_density(T, limit='rel'):
+    '''Eq. 3.6 from Dodelson '''
+    # non-relativistic m_i >> T
+    if limit == 'nonrel' :
+        n_i = g_i * (m_i * T / (2*np.pi))**(3/2) * np.exp(-m_i/T)
+
+    # relativistic m_i << T
+    if limit == 'rel'
+        n_i = g_i * T**3/np.pi**2
+
+    return n_i
+>>>>>>> 26639e40f51142cc809439f5034c0656975718e9
