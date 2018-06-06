@@ -40,3 +40,16 @@ def g_star(T):
         return 6.863
     if T <= 0.0005:
         return 3.363
+
+def g_starDM(mass, dof, Tlist):
+    '''takes a descending Tlist and returns geff including extra dof'''
+    geff = []
+    l = 0
+    for T in Tlist:
+        if T > mass
+        l +=1
+    for n in range(0, l):
+        geff = g_star(T[n]) + dof
+    for m in range(l, len(T)):
+        geff = g_star(T[n])
+    return geff
