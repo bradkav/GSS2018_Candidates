@@ -28,5 +28,15 @@ def g_star(T):
         return 72.25
     if T <= 1.2 and T > 0.2: #annihilation of c, cbar
         return 61.75
-    if T <= 0.2 and T > 0.13: #QCD transition
+    if T <= 0.2 and T > 0.139: #QCD transition
         return 17.25
+    if T <= 0.139 and T > 0.131: #annihilation of pi+, pi-
+        return 15.25
+    if T <= 0.131 and T > 0.106: #annihilation of pi0
+        return 14.25
+    if T <= 0.106 and T > 0.0008: #annihilation of mu+, mu-
+        return 10.75
+    if T <= 0.0008 and T > 0.0005: #neutrino decoupling
+        return 6.863
+    if T <= 0.0005:
+        return 3.363
