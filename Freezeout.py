@@ -2,6 +2,7 @@
 
 import numpy as np
 import scipy
+import matplotlib.pyplot as plt 
 
 M_pl = 2.435e18 #GeV/c^2
 
