@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
  "cells": [
   {
 <<<<<<< HEAD
@@ -111,10 +110,6 @@
 >>>>>>> 601ee9f1ef4ba0a8c3258454b66c72079a833745
   }
  },
-=======
- "cells": [],
- "metadata": {},
->>>>>>> parent of 6ef45eb... added text describing H(T)
  "nbformat": 4,
  "nbformat_minor": 2
 }
