@@ -62,6 +62,7 @@ class Freezeout(object):
         return geff
 
     def number_density(self, T, limit = 'rel'):
+        '''Number density at equilibrium'''
         # non-relativistic m_i >> T
         if limit == 'nonrel' :
             n_i = g_i * (m_i * T / (2*np.pi))**(3/2) * np.exp(-m_i/T)
@@ -72,8 +73,13 @@ class Freezeout(object):
 
         return n_i
 
-    def dYdx(self, Y, x, sigv):
+    def dYdx(self, Y, x):
         '''The differential equation for dY/dx, Y = nx/T^3, x = m/T'''
-        Yeq = number_density(self.Tlist) / self.Tlist**3
-        lambda = self.mass**3 * sigv / H(self.mass)
-        return (lambda / x**2) * (Y - Yeq)
+        sigv = 1e-30
+        Yeq = number_density(self.Tlist) / (self.Tlist)**3
+        lambd = (self.mass)**3 * sigv / H(self.mass)
+        return (lambd / x**2) * (Y - Yeq)
+
+    def xfreeze(self, sigv):
+        Yinf = 1 #Y at very late times,
+        return ((self.mass)**3 * sigv / H(self.mass)) * Yinf
