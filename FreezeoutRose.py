@@ -14,7 +14,7 @@ M_pl = 2.435e18 #GeV/c^2
 class Freezeout(object):
     def __init__(self,  mass = 1):
         self.mass = mass
-        self.Tlist = np.linspace(200, 1, 200)
+        self.Tlist = np.logspace(3, 0.01, 200)
 
     def H(self, T, g_star = None):
         if g_star is None:
@@ -114,17 +114,14 @@ class Freezeout(object):
         '''The differential equation for dY/dx, Y = nx/T^3, x = m/T'''
         return ((self.mass)**3 * sigv / self.H(self.mass, g_star = self.g_star_int(self.mass)) / x**2) * (Y - self.number_density(self.mass/x, g_star = self.g_star_int(self.mass/x)) / (self.mass/x)**3)
 
-
     def getY(self, xlist = None):
         '''Solves dYdx'''
         if xlist is None:
             xlist = self.mass / self.Tlist
         T0 = 1000
         Y0 = self.number_density(T0, g_star = self.g_star_int(T0)) / T0**3
-        print(Y0)
         Y = odeint(self.dYdx, Y0, xlist, args = (1e-20,))[:,0]
-        #return lambda x: np.interp(x, xlist, Y)
-        return Y
+        return lambda x: np.interp(x, xlist, Y)
 
     def xfreeze(self, sigv):
         Yinf = 1 #Y at very late times,
@@ -134,6 +131,13 @@ class Freezeout(object):
         T = Symbol('T')
         return solve(self.H(T, 106.25) == self.number_density(T, g_star = 106.25) * sigv, T)
 
-F = Freezeout()
-plt.plot(F.mass/ F.Tlist, F.getY())
+F1 = Freezeout(mass = 1)
+Y1 = F1.getY()
+plt.semilogx(F1.Tlist, Y1(F1.mass/F1.Tlist), label = 'm = 1')
+F2 = Freezeout(mass = 10)
+Y2 = F2.getY()
+plt.semilogx(F2.Tlist, F2.getY()(F2.mass/F2.Tlist), label = 'm = 10')
+plt.xlabel("$Tempature$/ GeV")
+plt.ylabel("$n_x / T^3$")
+plt.legend()
 plt.show()
