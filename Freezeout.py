@@ -61,3 +61,12 @@ class Freezeout(object):
     def dYdx(self, Yn, x):
         '''The '''
         lambda = self.mass**3 sigv / H(m)
+=======
+def g_star(T):
+    return 10.75
+
+<<<<<<< HEAD
+
+=======
+>>>>>>> dad7c5c7ecaaddc32fe8fc73ff4225e864c5e9e3
+>>>>>>> 26281d7038ab16a94aac0b5470e5082f79461f39
