@@ -2,14 +2,30 @@
 
 import numpy as np
 import scipy
+<<<<<<< HEAD
+<<<<<<< HEAD
+import matplotlib.pyplot as plt
+=======
+>>>>>>> 67816b95134fdb73731e4a14cbb6267b747c5fbf
+=======
 import matplotlib.pyplot as plt
 
+>>>>>>> 44d826c5572bae422c1ab0fda2291237ea4d0c10
 
 M_pl = 2.435e18 #GeV/c^2
 
 class Freezeout(object):
     def __init__(mass = 1):
 
+<<<<<<< HEAD
+
+
+
+
+=======
+
+<<<<<<< HEAD
+=======
 
     def Ht(self, T):
         return np.pi/3 * (g_star(T)/10)**(0.5) * T**2/M_pl
@@ -44,6 +60,7 @@ class Freezeout(object):
             return 6.863
         if T <= 0.0005:
             return 3.363
+>>>>>>> 44d826c5572bae422c1ab0fda2291237ea4d0c10
 
     def g_starDM(self, mass, dof, Tlist):
         '''takes a descending Tlist and returns geff including extra dof'''
@@ -59,9 +76,21 @@ class Freezeout(object):
         return geff
 
 
+<<<<<<< HEAD
+    return n_i
+
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> dad7c5c7ecaaddc32fe8fc73ff4225e864c5e9e3
+>>>>>>> 26281d7038ab16a94aac0b5470e5082f79461f39
+>>>>>>> 67816b95134fdb73731e4a14cbb6267b747c5fbf
+=======
     def dYdx(self, Yn, x):
         '''The '''
         lambda = self.mass**3 sigv / H(m)
+<<<<<<< HEAD
 =======
 def g_star(T):
     return 10.75
@@ -78,3 +107,6 @@ def number_density(T, limit='rel'):
         n_i = g_i * T**3/np.pi**2
 
     return n_i
+=======
+>>>>>>> 44d826c5572bae422c1ab0fda2291237ea4d0c10
+>>>>>>> e7b1d77a160a028d69005e1b31c0c9a5ec2677cb
