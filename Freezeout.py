@@ -2,11 +2,10 @@
 
 import numpy as np
 import scipy
-<<<<<<< HEAD
+
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
-=======
->>>>>>> 67816b95134fdb73731e4a14cbb6267b747c5fbf
+
 
 M_pl = 2.435e18 #GeV/c^2
 
@@ -66,12 +65,11 @@ class Freezeout(object):
     def dYdx(self, Yn, x):
         '''The '''
         lambda = self.mass**3 sigv / H(m)
-=======
+
 def g_star(T):
     return 10.75
 
 
-<<<<<<< HEAD
 def number_density(T, limit='rel'):
     '''Eq. 3.6 from Dodelson '''
     # non-relativistic m_i >> T
@@ -83,8 +81,3 @@ def number_density(T, limit='rel'):
         n_i = g_i * T**3/np.pi**2
 
     return n_i
-=======
-=======
->>>>>>> dad7c5c7ecaaddc32fe8fc73ff4225e864c5e9e3
->>>>>>> 26281d7038ab16a94aac0b5470e5082f79461f39
->>>>>>> 67816b95134fdb73731e4a14cbb6267b747c5fbf
