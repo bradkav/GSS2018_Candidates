@@ -4,18 +4,19 @@ import numpy as np
 import scipy
 import matplotlib.pyplot as plt
 from sympy.solvers import solve
-
+from sympy import Symbol
 
 M_pl = 2.435e18 #GeV/c^2
 
 
 class Freezeout(object):
-    def __init__(self,  Tlist, mass = 1):
+    def __init__(self,  mass = 1):
         self.mass = mass
-        self.Tlist = Tlist
 
-    def Ht(self, T):
-        return np.pi/3 * (g_star(T)/10)**(0.5) * T**2/M_pl
+    def H(self, T, g_star = None):
+        if g_star is None:
+            g_star = self.g_star(T)
+        return np.pi/3 * (g_star/10)**(0.5) * T**2/M_pl
 
     def g_star(self, T):
         '''Takes temperature in GeV, returns g_eff, numbers found from https://arxiv.org/pdf/1609.04979.pdf'''
@@ -56,27 +57,24 @@ class Freezeout(object):
             if T > mass:
                 l +=1
         for n in range(0, l):
-            geff = g_star(T[n]) + dof
+            geff = self.g_star(T[n]) + dof
         for m in range(l, len(T)):
-            geff = g_star(T[n])
+            geff = self.g_star(T[n])
         return geff
 
     def number_density(self, T, limit = 'rel'):
         '''Number density at equilibrium'''
         # non-relativistic m_i >> T
-        if limit == 'nonrel' :
-            n_i = g_i * (m_i * T / (2*np.pi))**(3/2) * np.exp(-m_i/T)
-
+        if limit != 'rel':
+            return 106.25 * (self.mass * T / (2*np.pi))**(3/2) * np.exp(-self.mass/T)
         # relativistic m_i << T
         if limit == 'rel':
-            n_i = g_i * T**3/np.pi**2
-
-        return n_i
+            return (106.25* (T)**3)/np.pi**2
 
     def dYdx(self, Y, x):
         '''The differential equation for dY/dx, Y = nx/T^3, x = m/T'''
         sigv = 1e-30
-        Yeq = number_density(self.Tlist) / (self.Tlist)**3
+        Yeq = self.number_density(self.Tlist) / (self.Tlist)**3
         lambd = (self.mass)**3 * sigv / H(self.mass)
         return (lambd / x**2) * (Y - Yeq)
 
@@ -85,4 +83,5 @@ class Freezeout(object):
         return ((self.mass)**3 * sigv / H(self.mass)) * Yinf
 
     def Tfreeze(self, sigv):
-        return solve(H(T) == number_density(T) * sigv, T)
+        T = Symbol('T')
+        return solve(self.H(T, 106.25) == self.number_density(T) * sigv, T)
