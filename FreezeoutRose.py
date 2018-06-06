@@ -3,7 +3,7 @@
 import numpy as np
 import scipy
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
+from sympy.solvers import solve
 
 
 M_pl = 2.435e18 #GeV/c^2
@@ -53,8 +53,8 @@ class Freezeout(object):
         geff = []
         l = 0
         for T in self.Tlist:
-            if T > mass
-            l +=1
+            if T > mass:
+                l +=1
         for n in range(0, l):
             geff = g_star(T[n]) + dof
         for m in range(l, len(T)):
@@ -68,7 +68,7 @@ class Freezeout(object):
             n_i = g_i * (m_i * T / (2*np.pi))**(3/2) * np.exp(-m_i/T)
 
         # relativistic m_i << T
-        if limit == 'rel'
+        if limit == 'rel':
             n_i = g_i * T**3/np.pi**2
 
         return n_i
@@ -83,3 +83,6 @@ class Freezeout(object):
     def xfreeze(self, sigv):
         Yinf = 1 #Y at very late times,
         return ((self.mass)**3 * sigv / H(self.mass)) * Yinf
+
+    def Tfreeze(self, sigv):
+        return solve(H(T) == number_density(T) * sigv, T)
