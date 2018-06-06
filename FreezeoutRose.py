@@ -10,7 +10,9 @@ M_pl = 2.435e18 #GeV/c^2
 
 
 class Freezeout(object):
-    def __init__(mass = 1):
+    def __init__(self,  Tlist, mass = 1):
+        self.mass = mass
+        self.Tlist = Tlist
 
     def Ht(self, T):
         return np.pi/3 * (g_star(T)/10)**(0.5) * T**2/M_pl
@@ -50,7 +52,7 @@ class Freezeout(object):
         '''takes a descending Tlist and returns geff including extra dof'''
         geff = []
         l = 0
-        for T in Tlist:
+        for T in self.Tlist:
             if T > mass
             l +=1
         for n in range(0, l):
@@ -59,7 +61,19 @@ class Freezeout(object):
             geff = g_star(T[n])
         return geff
 
+    def number_density(self, T, limit = 'rel'):
+        # non-relativistic m_i >> T
+        if limit == 'nonrel' :
+            n_i = g_i * (m_i * T / (2*np.pi))**(3/2) * np.exp(-m_i/T)
 
-    def dYdx(self, Yn, x):
-        '''The '''
-        lambda = self.mass**3 sigv / H(m)
+        # relativistic m_i << T
+        if limit == 'rel'
+            n_i = g_i * T**3/np.pi**2
+
+        return n_i
+
+    def dYdx(self, Y, x, sigv):
+        '''The differential equation for dY/dx, Y = nx/T^3, x = m/T'''
+        Yeq = number_density(self.Tlist) / self.Tlist**3
+        lambda = self.mass**3 * sigv / H(self.mass)
+        return (lambda / x**2) * (Y - Yeq)
