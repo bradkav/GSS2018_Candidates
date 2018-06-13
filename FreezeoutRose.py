@@ -124,22 +124,24 @@ class Freezeout(object):
         Y = odeint(self.dYdx, Y0, xlist, args = (1e-20,))[:,0]
         return lambda x: np.interp(x, xlist, Y)
 
-    def freezeRel(self,x, sigv):
+    def freezeRel(self,x, sigv, mass):
         return np.sqrt(x)*np.exp(-x)  - 1/(self.mass * M_pl * sigv)  #* self.g_star_int(self.mass/x)*10 * (3 * self.mass * M_pl*sigv)**2 / ((np.pi**(5)) * (2**(3)))
 
     def xFreezeNonrel(self, sigv):
         T = np.pi**3 / 3 * np.sqrt(1/10*106.25) * 1/(sigv*M_pl)
         return self.mass / T
 
-    def xFreezeRel(self, s):
+    def xFreezeRel(self, sigv, mass):
         x0 = 20
         x = []
-        return newton(self.freezeRel, x0, args = (s,), maxiter = 10000)
+        for s in sigv:
+            x.append(newton(self.freezeRel, x0, args = (s,mass,), maxiter = 10000))
+        return x
 
-    def RelicDensity(self, sigv):
+    def RelicDensity(self, sigv, mass):
         r = []
         for s in sigv:
-            r.append(0.2*(self.xFreezeRel(s)/20)*(1e-8/s))
+            r.append(0.2*(self.xFreezeRel(s, mass)/20)*(1e-8/s))
         return r
 
     def crossSec(self, mass, mz):
@@ -148,9 +150,13 @@ class Freezeout(object):
 
 F1 = Freezeout(mass = 1)
 #plt.semilogx(F1.mass/F1.Tlist, F1.getY()(F1.mass/F1.Tlist), label = 'm = 1')
-F2 = Freezeout(mass = 100)
-mDM = np.logspace(-7, 3)
-plt.semilogx(mDM, F2.RelicDensity(F2.crossSec(mDM, 10)))
+
+F2 = Freezeout(mass = 10)
+sigv = np.linspace(1e-20, 1e-19)
+plt.semilogx(sigv, F2.xFreezeRel(sigv, F2.mass))
+#plt.xlim()
+#mDM = np.logspace(-7, 3)
+#plt.semilogx(mDM, F2.RelicDensity(F2.crossSec(mDM, 10)))
 #plt.semilogx(F2.mass/F2.Tlist, F2.getY()(F2.mass/F2.Tlist), label = 'm = 10')
 # plt.xlabel("$x = m/T$/ GeV")
 # plt.ylabel("$Y = n_x / T^3$")
