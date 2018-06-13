@@ -14,7 +14,7 @@ M_pl = 2.435e18 #GeV/c^2
 class Freezeout(object):
     def __init__(self,  mass = 1):
         self.mass = mass
-        self.Tlist = np.logspace(3, 0.01, 200)
+        self.Tlist = np.logspace(3, -2, 200)
 
     def H(self, T, g_star = None):
         if g_star is None:
@@ -118,7 +118,7 @@ class Freezeout(object):
         '''Solves dYdx'''
         if xlist is None:
             xlist = self.mass / self.Tlist
-        T0 = 1000
+        T0 = 10000
         Y0 = self.number_density(T0, g_star = self.g_star_int(T0)) / T0**3
         Y = odeint(self.dYdx, Y0, xlist, args = (1e-20,))[:,0]
         return lambda x: np.interp(x, xlist, Y)
