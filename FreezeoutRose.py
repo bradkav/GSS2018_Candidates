@@ -14,7 +14,7 @@ M_pl = 2.435e18 #GeV/c^2
 class Freezeout(object):
     def __init__(self,  mass = 1):
         self.mass = mass
-        self.Tlist = np.logspace(3, -2, 200)
+        self.Tlist = np.logspace(4, -2, 200)
 
     def H(self, T, g_star = None):
         if g_star is None:
@@ -127,17 +127,38 @@ class Freezeout(object):
         Yinf = 1 #Y at very late times,
         return ((self.mass)**3 * sigv / H(self.mass)) * Yinf
 
-    def Tfreeze(self, sigv):
-        T = Symbol('T')
-        return solve(self.H(T, 106.25) == self.number_density(T, g_star = 106.25) * sigv, T)
+    def TfreezeNonrel(self, sigv):
+        #T = Symbol('T')
+        #return solve(self.H(T, 106.25) == self.number_density(T, g_star = 106.25) * sigv, T)
+        solve = False
+        T0 = 200
+        while solve == False:
+            T = np.pi**3 / 3 * np.sqrt(1/10*g_star_int(T0)) * 1/sigv * 1/Mpl
+            if T < T0:
+                T0 = T
+            else: solve = True
+        return T
+
+    def TfreezeNonrel(self, sigv):
+        T0 = 200
+
+        solve = False
+        T0 = 200
+        while solve == False:
+            T = Symbol('T')
+            Temp = solve(T*np.exp(-2*self.mass/T) == (self.mass*90*g_star_int(T0)*M_pl**2) / (2*np.pi**5), T)
+            if Temp < T0:
+                T0 = Temp
+            else: solve = True
+        return Temp
+
 
 F1 = Freezeout(mass = 1)
-Y1 = F1.getY()
-plt.semilogx(F1.Tlist, Y1(F1.mass/F1.Tlist), label = 'm = 1')
+plt.semilogx(F1.mass/F1.Tlist, F1.getY()(F1.mass/F1.Tlist), label = 'm = 1')
 F2 = Freezeout(mass = 10)
-Y2 = F2.getY()
-plt.semilogx(F2.Tlist, F2.getY()(F2.mass/F2.Tlist), label = 'm = 10')
-plt.xlabel("$Tempature$/ GeV")
-plt.ylabel("$n_x / T^3$")
+print(F2.TfreezeNonrel(1e-30))
+plt.semilogx(F2.mass/F2.Tlist, F2.getY()(F2.mass/F2.Tlist), label = 'm = 10')
+plt.xlabel("$x = m/T$/ GeV")
+plt.ylabel("$Y = n_x / T^3$")
 plt.legend()
 plt.show()
