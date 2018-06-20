@@ -9,7 +9,7 @@ from scipy.integrate import odeint
 from scipy.optimize import newton
 
 
-M_pl = 2.435e18 #GeV/c^2
+M_pl = 2.435e18 #GeV
 G_F = 1.166e-5
 
 class Freezeout(object):
@@ -100,13 +100,13 @@ class Freezeout(object):
             geff = self.g_star(T[n])
         return geff
 
-    def number_density(self, T, limit = 'rel', g_star = None):
+    def number_density(self, mass, T, limit = 'rel', g_star = None):
         if g_star is None:
             g_star = self.g_star(T)
         '''Number density at equilibrium'''
         # non-relativistic m_i >> T
         if limit != 'rel':
-            return g_star * (self.mass * T / (2*np.pi))**(3/2) * np.exp(-self.mass/T)
+            return g_star * (mass * T / (2*np.pi))**(3/2) * np.exp(-mass/T)
         # relativistic m_i << T
         if limit == 'rel':
             return (g_star * (T)**3)/np.pi**2
@@ -124,42 +124,55 @@ class Freezeout(object):
         Y = odeint(self.dYdx, Y0, xlist, args = (1e-20,))[:,0]
         return lambda x: np.interp(x, xlist, Y)
 
-    def freezeNonRel(self,x, sigv):
-        return np.sqrt(x)*np.exp(-x)  - 1/(self.mass * M_pl * sigv)  #* self.g_star_int(self.mass/x)*10 * (3 * self.mass * M_pl*sigv)**2 / ((np.pi**(5)) * (2**(3)))
+    def freezeNonRel(self,x, mass,mz):
+        return np.sqrt(x)*np.exp(-x)  - 1/(mass * M_pl * self.crossSecNonRel(mass, mz))  #* self.g_star_int(self.mass/x)*10 * (3 * self.mass * M_pl*sigv)**2 / ((np.pi**(5)) * (2**(3)))
 
-    def xFreezeRel(self, sigv):
+    def xFreezeRel(self, mass):
         x = []
-        for s in sigv:
-            T = np.pi**3 / 3 * np.sqrt(1/10*106.25) * 1/(s*M_pl)
-            x.append(self.mass / T)
+        for m in mass:
+            T = np.pi**3 / 3 * np.sqrt(1/10*106.25) * 1/(self.crossSecRel(m)*M_pl)
+            print(T)
+            x.append(m / T)
         return x
 
-    def xFreezeNonRel(self, sigv):
-        x0 = 20
+    def xFreezeNonRel(self, mass, mz):
+        x0 = 10
         x = []
-        for s in sigv:
-            x.append(newton(self.freezeNonRel, x0, args = (s,), maxiter = 10000))
+        for m in mass:
+            x.append(newton(self.freezeNonRel, x0, args = (m,mz), maxiter = 10000))
         return x
 
-    def RelicDensity(self, sigv, mass):
-        r = []
-        for s in sigv:
-            r.append(0.2*(self.xFreezeRel(s, mass)/20)*(1e-8/s))
+    def RelicDensityNonRel(self, mass, mz):
+        pc = 1.055e-5 /(5.06e13**3) #GeV
+        T0 = 2.75e-13 #GeV
+        xf = self.xFreezeNonRel(mass, mz)
+        for x in xf:
+            r = (x * T0**3) / (M_pl * self.crossSecNonRel(mass, mz) * pc)
         return r
 
-    def crossSec(self, mass, mz):
+    def RelicDensityRel(self, mass):
+        pc = 1.055e-5 /(5.06e13**3) #GeV
+        xf = self.xFreezeRel(mass)
+        for x in xf:
+            r = (mass * self.number_density(mass, mass/x)) / (M_pl * self.crossSecRel(mass) * pc)
+        return r
+
+    def crossSecNonRel(self, mass, mz):
         return mass**2 / (((mass+mz)**2 - mz**2)**2 + mz**4)
 
+    def crossSecRel(self, mass):
+        return mass**(-2)
 
-F1 = Freezeout(mass = 1)
-#plt.semilogx(F1.mass/F1.Tlist, F1.getY()(F1.mass/F1.Tlist), label = 'm = 1')
-
-F2 = Freezeout(mass = 10)
-sigv = np.linspace(1e-20, 1e-10)
-plt.semilogx(sigv, F2.xFreezeNonRel(sigv))
+F2 = Freezeout(mass = 100)
+mass = np.logspace(-1, 5, 100)
+# plt.loglog(mass, F2.RelicDensityNonRel(mass, 10))
+# plt.loglog(mass, F2.RelicDensityNonRel(mass, 100))
+# plt.loglog(mass, F2.RelicDensityNonRel(mass, 1000))
+mass = np.logspace(-5, -3, 100)
+plt.loglog(mass, F2.RelicDensityRel(mass))
 #plt.xlim()
 #mDM = np.logspace(-7, 3)
-#plt.semilogx(mDM, F2.RelicDensity(F2.crossSec(mDM, 10)))
+#plt.semilogx(mDM, F2.RelicDensity(F2.crossSecNonRel(mDM, 10)))
 #plt.semilogx(F2.mass/F2.Tlist, F2.getY()(F2.mass/F2.Tlist), label = 'm = 10')
 # plt.xlabel("$x = m/T$/ GeV")
 # plt.ylabel("$Y = n_x / T^3$")
