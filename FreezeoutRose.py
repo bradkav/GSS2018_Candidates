@@ -113,7 +113,11 @@ class Freezeout(object):
 
     def dYdx(self, Y, x, sigv):
         '''The differential equation for dY/dx, Y = nx/T^3, x = m/T'''
+<<<<<<< HEAD
         return ((self.mass)**3 * sigv / self.H(self.mass, g_star = self.g_star_int(self.mass)) / x**2) * (Y**2 - (self.number_density(self.mass/x, g_star=self.g_star_int(self.mass/x))/(self.mass/x)**3)**2)
+=======
+        return ((self.mass)**3 * sigv / self.H(self.mass, g_star = self.g_star_int(self.mass)) / x**2) * (Y**2 - (self.number_density(self.mass/x, g_star = self.g_star_int(self.mass/x)) / (self.mass/x)**3)**2)
+>>>>>>> dff86eb94b7c6cac2f7cc412d481c01a456b135f
 
     def getY(self, xlist = None):
         '''Solves dYdx'''
@@ -124,6 +128,7 @@ class Freezeout(object):
         Y = odeint(self.dYdx, Y0, xlist, args = (1e-20,))[:,0]
         return lambda x: np.interp(x, xlist, Y)
 
+<<<<<<< HEAD
     def freezeNonRel(self,x, mass,mz):
         return np.sqrt(x)*np.exp(-x)  - 1/(mass * M_pl * self.crossSecNonRel(mass, mz))  #* self.g_star_int(self.mass/x)*10 * (3 * self.mass * M_pl*sigv)**2 / ((np.pi**(5)) * (2**(3)))
 
@@ -173,6 +178,28 @@ plt.loglog(mass, F2.RelicDensityRel(mass))
 #plt.xlim()
 #mDM = np.logspace(-7, 3)
 #plt.semilogx(mDM, F2.RelicDensity(F2.crossSecNonRel(mDM, 10)))
+=======
+    def freezeRel(self,x, sigv):
+        return sigv* np.sqrt(x)*np.exp(-x) * np.sqrt(100*10) * (3 * self.mass * M_pl) / ((np.pi**(5/2)) * (2**(3/2)))
+
+    def xFreezeNonrel(self, sigv):
+        T = np.pi**3 / 3 * np.sqrt(1/10*106.25) * 1/sigv * 1/M_pl
+        return self.mass / T
+
+    def xFreezeRel(self, sigv):
+        x0 = self.mass / 200
+        x = []
+        for s in sigv:
+            x.append(newton(self.freezeRel, x0, args = (s,), maxiter = 10000))
+        return x
+
+
+F1 = Freezeout(mass = 1)
+#plt.semilogx(F1.mass/F1.Tlist, F1.getY()(F1.mass/F1.Tlist), label = 'm = 1')
+F2 = Freezeout(mass = 10)
+sigv = np.linspace(1e-20, 1e-10)
+plt.plot(sigv, F2.xFreezeRel(sigv))
+>>>>>>> dff86eb94b7c6cac2f7cc412d481c01a456b135f
 #plt.semilogx(F2.mass/F2.Tlist, F2.getY()(F2.mass/F2.Tlist), label = 'm = 10')
 # plt.xlabel("$x = m/T$/ GeV")
 # plt.ylabel("$Y = n_x / T^3$")
