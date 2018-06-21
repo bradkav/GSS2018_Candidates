@@ -15,7 +15,7 @@ G_F = 1.166e-5
 class Freezeout(object):
     def __init__(self,  mass = 1):
         self.mass = mass
-        self.Tlist = np.logspace(4, -2, 200)
+        self.Tlist = np.logspace(2, -3, 200)
 
     def H(self, T, g_star = None):
         if g_star is None:
@@ -87,19 +87,6 @@ class Freezeout(object):
                 gs.append(3.363)
         return gs
 
-    def g_starDM(self, mass, dof, Tlist):
-        '''takes a descending Tlist and returns geff including extra dof'''
-        geff = []
-        l = 0
-        for T in self.Tlist:
-            if T > mass:
-                l +=1
-        for n in range(0, l):
-            geff = self.g_star(T[n]) + dof
-        for m in range(l, len(T)):
-            geff = self.g_star(T[n])
-        return geff
-
     def number_density(self, mass, T, limit = 'rel', g_star = None):
         if g_star is None:
             g_star = self.g_star(T)
@@ -111,17 +98,17 @@ class Freezeout(object):
         if limit == 'rel':
             return (g_star * (T)**3)/np.pi**2
 
-    def dYdx(self, Y, x, sigv):
+    def dYdx(self, Y, x, sigv, mass):
         '''The differential equation for dY/dx, Y = nx/T^3, x = m/T'''
-        return ((self.mass)**3 * sigv / self.H(self.mass, g_star = self.g_star_int(self.mass)) / x**2) * (Y**2 - (self.number_density(self.mass/x, g_star=self.g_star_int(self.mass/x))/(self.mass/x)**3)**2)
+        return ((mass)**3 * sigv / self.H(mass, g_star = self.g_star_int(mass)) / x**2) * (Y**2 - (self.number_density(mass, mass/x, g_star=self.g_star_int(mass/x))/(mass/x)**3)**2)
 
-    def getY(self, xlist = None):
+    def getY(self, mass, xlist = None):
         '''Solves dYdx'''
         if xlist is None:
-            xlist = self.mass / self.Tlist
-        T0 = 10000
-        Y0 = self.number_density(T0, g_star = self.g_star_int(T0)) / T0**3
-        Y = odeint(self.dYdx, Y0, xlist, args = (1e-20,))[:,0]
+            xlist = mass / np.logspace(3,-3)
+        T0 = 100
+        Y0 = self.number_density(F2.mass, T0, g_star = self.g_star_int(T0)) / T0**3
+        Y = odeint(self.dYdx, Y0, xlist, args = (1e-20, mass,))[:,0]
         return lambda x: np.interp(x, xlist, Y)
 
     def freezeNonRel(self,x, mass,mz):
@@ -130,7 +117,7 @@ class Freezeout(object):
     def xFreezeRel(self, mass):
         x = []
         for m in mass:
-            T = (np.pi**3 / 3 * np.sqrt(1/10*106.25) * 1/(self.crossSecRel(m)*(np.sqrt(3 *8.61e-14/m))*M_pl))**(2/3)
+            T = (np.pi**3 / 3 * np.sqrt(1/10*106.25) * 1/(m**(-2)*(np.sqrt(3 *8.61e-14/m))*M_pl))**(2/3)
             x.append(m / T)
         return x
 
@@ -159,20 +146,17 @@ class Freezeout(object):
     def crossSecNonRel(self, mass, mz):
         return mass**2 / (((mass+mz)**2 - mz**2)**2 + mz**4)
 
-    def crossSecRel(self, mass):
-        return mass**(-2)
-
 F2 = Freezeout(mass = 100)
-mass = np.logspace(-1, 5, 100)
-plt.loglog(mass, F2.RelicDensityNonRel(mass, 10))
-plt.loglog(mass, F2.RelicDensityNonRel(mass, 100))
-plt.loglog(mass, F2.RelicDensityNonRel(mass, 1000))
-mass = np.logspace(-5.5, -3.5, 100)
-plt.loglog(mass, F2.RelicDensityRel(mass))
+# mass = np.logspace(-1, 5, 100)
+# plt.loglog(mass, F2.RelicDensityNonRel(mass, 10))
+# plt.loglog(mass, F2.RelicDensityNonRel(mass, 100))
+# plt.loglog(mass, F2.RelicDensityNonRel(mass, 1000))
+# mass = np.logspace(-5.5, -3.5, 100)
+# plt.loglog(mass, F2.RelicDensityRel(mass))
 #plt.xlim()
 #mDM = np.logspace(-7, 3)
 #plt.semilogx(mDM, F2.RelicDensity(F2.crossSecNonRel(mDM, 10)))
-#plt.semilogx(F2.mass/F2.Tlist, F2.getY()(F2.mass/F2.Tlist), label = 'm = 10')
+plt.semilogx(F2.mass/F2.Tlist, F2.getY(F2.mass)(F2.mass/F2.Tlist), label = 'm = 10')
 # plt.xlabel("$x = m/T$/ GeV")
 # plt.ylabel("$Y = n_x / T^3$")
 # plt.legend()
